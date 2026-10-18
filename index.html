@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Belajar WebGPU - Transisi Hitam ke Putih</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #121214;
+      color: #e1e1e6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    header {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #00d2df;
+      margin-bottom: 6px;
+    }
+    p {
+      color: #a8a8b3;
+      font-size: 0.95rem;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      max-width: 660px;
+      width: 100%;
+    }
+    canvas {
+      border: 2px solid #29292e;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      background-color: #000;
+      width: 100%;
+      max-width: 640px;
+      aspect-ratio: 4 / 3;
+    }
+    #status {
+      font-size: 0.88rem;
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: #202024;
+      color: #8257e5;
+    }
+    .error {
+      background: #3a1d1d !important;
+      color: #f75a68 !important;
+    }
+    .success {
+      background: #173b2c !important;
+      color: #04d361 !important;
+    }
+
+    /* Live Monitor Card */
+    .monitor-card {
+      background: #1a1a1e;
+      border: 1px solid #2d2d34;
+      border-radius: 10px;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .monitor-card h3 {
+      font-size: 1rem;
+      color: #00d2df;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #25252b;
+      font-size: 0.92rem;
+    }
+    .metric-row:last-of-type {
+      border-bottom: none;
+    }
+    .metric-label {
+      color: #c4c4cc;
+    }
+    .metric-val {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #ffdb58;
+    }
+    .metric-note {
+      font-size: 0.8rem;
+      color: #8d8d99;
+      margin-left: 6px;
+    }
+
+    /* Progress bar visualizer */
+    .bar-container {
+      margin-top: 14px;
+      background: #09090a;
+      border-radius: 20px;
+      height: 22px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #323238;
+    }
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #333 0%, #fff 100%);
+      transition: width 0.05s linear;
+      border-radius: 20px;
+    }
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #737380;
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>WebGPU Playground</h1>
+      <p>Challenge: Transisi Halus Hitam ke Putih</p>
+    </header>
+
+    <canvas id="webgpu-canvas" width="640" height="480"></canvas>
+    <div id="status">Menginisialisasi WebGPU...</div>
+
+    <!-- Live Monitor untuk melihat angka trigonometri & warna -->
+    <div class="monitor-card">
+      <h3>📊 Live Monitor: Perjalanan Nilai Trigonometri</h3>
+
+      <div class="metric-row">
+        <span class="metric-label">1. Waktu berlalu (<code>t</code>):</span>
+        <span><span id="val-t" class="metric-val">0.00</span> <span class="metric-note">detik</span></span>
+      </div>
+
+      <div class="metric-row">
+        <span class="metric-label">2. Nilai <code>Math.sin(t)</code>:</span>
+        <span><span id="val-sin" class="metric-val">+0.000</span> <span class="metric-note">(rentang: -1.0 s/d +1.0)</span></span>
+      </div>
+
+      <div class="metric-row">
+        <span class="metric-label">3. Nilai Warna Akhir <code>v</code>:</span>
+        <span><span id="val-v" class="metric-val" style="color: #04d361;">0.000</span> <span class="metric-note">(rentang: 0.0 s/d 1.0)</span></span>
+      </div>
+
+      <div class="bar-container">
+        <div id="color-bar" class="bar-fill"></div>
+      </div>
+      <div class="bar-labels">
+        <span>0.0 (Hitam Pekat)</span>
+        <span>0.5 (Abu-abu)</span>
+        <span>1.0 (Putih Bersih)</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
